@@ -27,8 +27,12 @@ def main():
         f"&scope=talk_message"
     )
 
-    print("브라우저가 열립니다. 카카오 계정으로 로그인하세요.")
-    webbrowser.open(auth_url)
+    print("\n아래 URL을 브라우저(PC 또는 폰)에서 열고 카카오 계정으로 로그인하세요:\n")
+    print(auth_url)
+    try:
+        webbrowser.open(auth_url)
+    except Exception:
+        pass  # 헤드리스 서버에서는 무시
 
     print("\n로그인 후 주소창의 URL 전체를 복사하세요.")
     print("예) https://example.com/?code=XXXXXX")

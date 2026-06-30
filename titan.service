@@ -1,0 +1,15 @@
+[Unit]
+Description=타이탄 자동매매
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/YOUR_USER/auto-invest
+ExecStart=/usr/bin/python3 trader.py
+Restart=on-failure
+RestartSec=30
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
