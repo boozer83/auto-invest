@@ -8,7 +8,7 @@ _SELL_TR = "VTTC0801U" if MOCK else "TTTC0801U"
 _BAL_TR  = "VTTC8434R" if MOCK else "TTTC8434R"
 
 
-def get_holdings() -> dict[str, int]:
+def get_holdings() -> dict:
     """보유 종목과 수량 반환 {symbol: quantity}"""
     resp = requests.get(
         f"{BASE_URL}/uapi/domestic-stock/v1/trading/inquire-balance",

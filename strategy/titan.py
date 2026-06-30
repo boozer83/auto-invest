@@ -11,9 +11,9 @@ class TitanStrategy:
 
     def __init__(self):
         # 직전 체크 때 20MA 위에 있었는지 기록 {symbol: bool}
-        self._prev_above_ma20: dict[str, bool] = {}
+        self._prev_above_ma20: dict = {}
 
-    def calculate_mas(self, df: pd.DataFrame) -> tuple[float, float]:
+    def calculate_mas(self, df: pd.DataFrame) -> tuple:
         """df: 'close' 컬럼을 가진 일봉 DataFrame (오래된 것 → 최신 순)"""
         if len(df) < LONG_MA:
             raise ValueError(f"데이터 부족: {len(df)}개 (최소 {LONG_MA}개 필요)")

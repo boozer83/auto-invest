@@ -37,8 +37,8 @@ def main():
 
     # ── 1. 과거 데이터 로딩 (MA 계산용) ──────────────────────────
     log_info("과거 데이터 로딩 중...")
-    history: dict[str, object] = {}
-    mas:     dict[str, tuple]  = {}  # {symbol: (ma20, ma200)}
+    history: dict = {}
+    mas:     dict = {}  # {symbol: (ma20, ma200)}
 
     for name, symbol in STOCKS.items():
         try:
