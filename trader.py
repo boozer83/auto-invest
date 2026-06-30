@@ -5,10 +5,18 @@ from api.market import fetch_current_price, fetch_history
 from api.order  import get_holdings, buy_market, sell_market
 from strategy.titan import TitanStrategy
 from logger import log_signal, log_order, log_error, log_info
+from notifier import kakao
 
 
 MARKET_OPEN  = (9,  0)
 MARKET_CLOSE = (15, 30)
+
+
+def _notify(msg: str):
+    try:
+        kakao.send(msg)
+    except Exception as e:
+        log_error(f"카카오 알림 실패: {e}")
 
 
 def is_market_open() -> bool:
@@ -77,6 +85,7 @@ def main():
                         if resp.get("rt_cd") == "0":
                             positions[symbol] = qty
                             log_order("매수", name, symbol, price, qty)
+                            _notify(f"[매수] {name}\n{qty}주 @ {price:,.0f}원\n총 {price*qty:,.0f}원")
                         else:
                             log_error(f"매수 실패: {resp}")
 
@@ -86,6 +95,7 @@ def main():
                         if resp.get("rt_cd") == "0":
                             del positions[symbol]
                             log_order("매도", name, symbol, price, qty)
+                            _notify(f"[매도] {name}\n{qty}주 @ {price:,.0f}원\n총 {price*qty:,.0f}원")
                         else:
                             log_error(f"매도 실패: {resp}")
 

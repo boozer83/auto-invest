@@ -35,3 +35,7 @@ BUY_AMOUNT = 1_000_000  # 100만원
 
 # 가격 체크 주기 (초)
 CHECK_INTERVAL = 60
+
+# 카카오톡 알림 (REST API 키)
+# developers.kakao.com → 내 애플리케이션 → 앱 키 → REST API 키
+KAKAO_REST_API_KEY = "YOUR_KAKAO_REST_API_KEY"
