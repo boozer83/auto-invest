@@ -6,6 +6,7 @@ from api.order  import get_holdings, buy_market, sell_market
 from strategy.titan import TitanStrategy
 from logger import log_signal, log_order, log_error, log_info
 from notifier import kakao
+from report import save_trade, add_position, remove_position, generate_daily_report
 
 
 MARKET_OPEN  = (9,  0)
@@ -61,11 +62,22 @@ def main():
     log_info(f"체크 주기: {CHECK_INTERVAL}초 / 매수금액: {BUY_AMOUNT:,}원")
     log_info("─" * 50)
 
+    report_sent_date = None  # 오늘 리포트 전송 여부 추적
+
     # ── 3. 메인 루프 ───────────────────────────────────────────────
     while True:
         try:
+            now  = datetime.now()
+            today = now.strftime("%Y-%m-%d")
+
+            # 장 마감 후 일일 리포트 (15:31 ~ 15:35 사이 1회)
+            if (now.hour, now.minute) in [(15, 31), (15, 32), (15, 33), (15, 34), (15, 35)]:
+                if report_sent_date != today:
+                    log_info("일일 리포트 생성 중...")
+                    generate_daily_report()
+                    report_sent_date = today
+
             if not is_market_open():
-                log_info("장 마감 또는 휴장일. 대기 중...")
                 time.sleep(60)
                 continue
 
@@ -85,6 +97,8 @@ def main():
                         if resp.get("rt_cd") == "0":
                             positions[symbol] = qty
                             log_order("매수", name, symbol, price, qty)
+                            save_trade("BUY", name, symbol, price, qty)
+                            add_position(name, symbol, price, qty)
                             _notify(f"[매수] {name}\n{qty}주 @ {price:,.0f}원\n총 {price*qty:,.0f}원")
                         else:
                             log_error(f"매수 실패: {resp}")
@@ -95,6 +109,8 @@ def main():
                         if resp.get("rt_cd") == "0":
                             del positions[symbol]
                             log_order("매도", name, symbol, price, qty)
+                            save_trade("SELL", name, symbol, price, qty)
+                            remove_position(symbol)
                             _notify(f"[매도] {name}\n{qty}주 @ {price:,.0f}원\n총 {price*qty:,.0f}원")
                         else:
                             log_error(f"매도 실패: {resp}")

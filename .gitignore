@@ -1,5 +1,7 @@
 config.py
 kakao_token.json
+trades.json
+positions.json
 logs/
 __pycache__/
 *.pyc
