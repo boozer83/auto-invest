@@ -9,8 +9,9 @@ from notifier import kakao
 from report import save_trade, add_position, remove_position, generate_daily_report
 
 
-MARKET_OPEN  = (9,  0)
-MARKET_CLOSE = (15, 30)
+MARKET_OPEN        = (9,  0)
+MARKET_CLOSE       = (15, 30)
+MARKET_ORDER_LIMIT = (15, 25)  # 이 시간 이후 신규 주문 금지
 
 
 def _notify(msg: str):
@@ -25,7 +26,7 @@ def is_market_open() -> bool:
     if now.weekday() >= 5:  # 토/일
         return False
     t = (now.hour, now.minute)
-    return MARKET_OPEN <= t < MARKET_CLOSE
+    return MARKET_OPEN <= t < MARKET_ORDER_LIMIT
 
 
 def calc_buy_qty(price: float) -> int:
@@ -91,7 +92,7 @@ def main():
 
                     log_signal(name, symbol, signal, price, ma20, ma200)
 
-                    if signal == "BUY" and symbol not in positions:
+                    if signal == "BUY" and symbol not in positions and is_market_open():
                         qty  = calc_buy_qty(price)
                         resp = buy_market(symbol, qty)
                         if resp.get("rt_cd") == "0":
@@ -103,7 +104,7 @@ def main():
                         else:
                             log_error(f"매수 실패: {resp}")
 
-                    elif signal == "SELL" and symbol in positions:
+                    elif signal == "SELL" and symbol in positions and is_market_open():
                         qty  = positions[symbol]
                         resp = sell_market(symbol, qty)
                         if resp.get("rt_cd") == "0":
